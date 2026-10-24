@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Presentasi PPDA 12</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/plus-jakarta-sans@5.0.3/index.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/playfair-display@5.0.19/index.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --brown-dark:#3E2723;
+  --brown:#5D4037;
+  --brown-light:#8D6E63;
+  --green:#2E7D32;
+  --green-light:#4CAF50;
+  --green-bright:#66BB6A;
+  --cream:#FAF6F0;
+}
+html,body{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  background:var(--cream);
+  color:#1a1a1a;
+  overflow:hidden;
+  height:100vh;
+  width:100vw;
+}
+
+.presentation{width:100vw;height:100vh;position:relative}
+
+.slide{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  padding:3rem;
+  opacity:0;
+  transform:translateX(60px);
+  transition:all 0.6s cubic-bezier(0.4,0,0.2,1);
+  pointer-events:none;
+}
+.slide.active{opacity:1;transform:translateX(0);pointer-events:auto}
+.slide.prev{opacity:0;transform:translateX(-60px)}
+
+/* Opening */
+.slide-opening{
+  background:linear-gradient(135deg,var(--brown-dark),#1a0f0a);
+  position:relative;
+}
+.slide-opening::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 70% 30%,rgba(76,175,80,0.25),transparent 60%);
+}
+.opening-inner{
+  text-align:center;
+  position:relative;z-index:2;
+  animation:fadeUp 0.8s ease both;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.opening-logo{width:140px;height:140px;margin:0 auto 2rem}
+.opening-tag{
+  display:inline-block;
+  background:rgba(76,175,80,0.15);
+  color:var(--green-light);
+  padding:0.4rem 1.2rem;
+  border-radius:50px;
+  font-size:0.85rem;
+  font-weight:600;
+  margin-bottom:1.5rem;
+  border:1px solid rgba(76,175,80,0.3);
+  letter-spacing:2px;
+}
+.opening-title{
+  font-family:'Playfair Display',serif;
+  font-size:4.5rem;
+  font-weight:700;
+  color:var(--cream);
+  line-height:1.1;
+  margin-bottom:1.2rem;
+  letter-spacing:-1px;
+}
+.opening-title .green{
+  background:linear-gradient(135deg,var(--green-light),var(--green-bright));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.opening-subtitle{
+  font-size:1.15rem;
+  color:rgba(250,246,240,0.7);
+  margin-bottom:2.5rem;
+  max-width:550px;
+  margin-left:auto;margin-right:auto;
+  line-height:1.6;
+}
+.opening-start{
+  display:inline-flex;align-items:center;gap:0.7rem;
+  background:linear-gradient(135deg,var(--green),var(--green-light));
+  color:white;padding:0.9rem 2rem;
+  border-radius:50px;border:none;cursor:pointer;
+  font-weight:700;font-size:1rem;
+  transition:all 0.3s;
+  box-shadow:0 8px 25px rgba(76,175,80,0.3);
+}
+.opening-start:hover{transform:translateY(-3px);box-shadow:0 12px 35px rgba(76,175,80,0.5)}
+
+/* Content */
+.slide-content{background:var(--cream)}
+.slide-content:nth-child(even){background:linear-gradient(135deg,#f5ede0,var(--cream))}
+.content-layout{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4rem;
+  max-width:1200px;
+  width:100%;
+  align-items:center;
+}
+.slide.active .content-right{animation:fadeUp 0.7s ease 0.3s both}
+
+/* Photo Upload */
+.photo-upload{
+  position:relative;
+  border:2px dashed rgba(93,64,55,0.25);
+  border-radius:20px;
+  background:rgba(93,64,55,0.03);
+  cursor:pointer;
+  transition:all 0.3s;
+  overflow:hidden;
+  aspect-ratio:4/5;
+}
+.photo-upload:hover{
+  border-color:var(--green);
+  background:rgba(76,175,80,0.04);
+  transform:translateY(-4px);
+  box-shadow:0 15px 40px rgba(93,64,55,0.12);
+}
+.photo-upload.has-image{border-style:solid;border-color:var(--green)}
+.photo-upload input[type="file"]{display:none}
+.photo-placeholder{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:0.6rem;
+  color:var(--brown);
+}
+.photo-placeholder .icon{font-size:3rem;opacity:0.5}
+.photo-placeholder .title{font-weight:700;font-size:1.1rem;color:var(--brown-dark)}
+.photo-placeholder .hint{font-size:0.85rem;color:var(--brown-light)}
+.photo-preview{
+  width:100%;height:100%;
+  object-fit:cover;
+  display:block;
+  position:absolute;inset:0;
+}
+.photo-actions{
+  position:absolute;top:12px;right:12px;
+  display:flex;gap:0.4rem;
+  opacity:0;transition:opacity 0.3s;
+  z-index:10;
+}
+.photo-upload:hover .photo-actions{opacity:1}
+.photo-btn{
+  width:36px;height:36px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.95);
+  border:1px solid rgba(0,0,0,0.08);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;
+  transition:all 0.2s;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+.photo-btn:hover{background:var(--green);color:white;transform:scale(1.1)}
+.photo-btn.delete:hover{background:#ef4444}
+.photo-label{
+  position:absolute;bottom:12px;left:12px;
+  background:rgba(15,23,42,0.85);
+  padding:0.4rem 0.8rem;
+  border-radius:20px;
+  font-size:0.75rem;
+  color:var(--green-light);
+  font-weight:600;
+  opacity:0;transition:opacity 0.3s;
+  z-index:10;
+}
+.photo-upload:hover .photo-label{opacity:1}
+
+/* Content Right */
+.slide-number{
+  display:inline-block;
+  background:var(--green);
+  color:white;
+  padding:0.35rem 0.9rem;
+  border-radius:50px;
+  font-size:0.8rem;
+  font-weight:700;
+  margin-bottom:1.2rem;
+}
+.content-title{
+  font-family:'Playfair Display',serif;
+  font-size:2.5rem;
+  color:var(--brown-dark);
+  line-height:1.15;
+  margin-bottom:1.2rem;
+  letter-spacing:-0.5px;
+}
+.content-title .green{color:var(--green)}
+.content-desc{
+  color:var(--brown);
+  font-size:1rem;
+  line-height:1.7;
+  margin-bottom:1.5rem;
+}
+.definition-box{
+  background:white;
+  border-left:3px solid var(--green);
+  padding:1.2rem;
+  border-radius:0 12px 12px 0;
+  box-shadow:0 4px 15px rgba(93,64,55,0.06);
+  margin-bottom:1.2rem;
+}
+.definition-box h4{
+  font-size:0.75rem;
+  color:var(--green);
+  text-transform:uppercase;
+  letter-spacing:2px;
+  margin-bottom:0.4rem;
+  font-weight:700;
+}
+.definition-box p{
+  color:var(--brown-dark);
+  font-size:0.95rem;
+  line-height:1.6;
+  font-weight:500;
+}
+.key-points{list-style:none;display:flex;flex-direction:column;gap:0.6rem}
+.key-points li{
+  display:flex;align-items:flex-start;gap:0.7rem;
+  color:var(--brown);font-size:0.9rem;line-height:1.5;
+}
+.key-points li::before{
+  content:'';width:6px;height:6px;
+  border-radius:50%;background:var(--green);
+  flex-shrink:0;margin-top:8px;
+}
+
+/* Controls */
+.controls{
+  position:fixed;bottom:1.5rem;left:50%;
+  transform:translateX(-50%);
+  display:flex;align-items:center;gap:0.8rem;
+  background:rgba(15,23,42,0.9);
+  backdrop-filter:blur(15px);
+  padding:0.6rem 1.2rem;
+  border-radius:50px;
+  border:1px solid rgba(255,255,255,0.1);
+  z-index:100;
+}
+.nav-btn{
+  width:36px;height:36px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  color:white;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;font-size:1rem;
+}
+.nav-btn:hover{background:var(--green);border-color:var(--green)}
+.nav-btn:disabled{opacity:0.3;cursor:not-allowed}
+.slide-counter{
+  font-size:0.85rem;
+  color:rgba(255,255,255,0.8);
+  font-weight:600;
+  min-width:60px;text-align:center;
+}
+.progress-bar{
+  position:fixed;top:0;left:0;
+  height:2px;
+  background:var(--green);
+  transition:width 0.5s ease;
+  z-index:100;
+}
+.dots{display:flex;gap:0.4rem}
+.dot{
+  width:6px;height:6px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.2);
+  cursor:pointer;transition:all 0.3s;
+}
+.dot.active{background:var(--green-light);width:18px;border-radius:10px}
+.hint{
+  position:fixed;top:1.5rem;right:1.5rem;
+  background:rgba(15,23,42,0.7);
+  backdrop-filter:blur(10px);
+  padding:0.4rem 0.8rem;
+  border-radius:6px;
+  font-size:0.75rem;
+  color:rgba(255,255,255,0.6);
+  z-index:100;
+}
+.hint kbd{
+  background:rgba(255,255,255,0.1);
+  padding:0.15rem 0.4rem;
+  border-radius:3px;
+  font-family:inherit;
+  color:rgba(255,255,255,0.8);
+}
+
+@media(max-width:900px){
+  .content-layout{grid-template-columns:1fr;gap:2rem}
+  .opening-title{font-size:2.8rem}
+  .content-title{font-size:2rem}
+  .slide{padding:1.5rem}
+  .photo-upload{aspect-ratio:16/10}
+  .hint{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<div class="hint"><kbd>←</kbd> <kbd>→</kbd> navigasi</div>
+
+<div class="presentation">
+
+  <!-- SLIDE 1: OPENING -->
+  <div class="slide slide-opening active" data-slide="1">
+    <div class="opening-inner">
+    
+      <div class="opening-tag">PPDA 12</div>
+      <h1 class="opening-title">Panitia Putra PPDA <span class="green">ke-XII</span></h1>
+      <p class="opening-subtitle">mempersembahkan</p>
+      <button class="opening-start" onclick="goToSlide(2)">Mulai Presentasi <span>→</span></button>
+    </div>
+  </div>
+
+  <!-- SLIDE 2 -->
+  <div class="slide slide-content" data-slide="2">
+    <div class="content-layout">
+      <div class="content-left">
+        <div class="photo-upload" data-photo="slide2" onclick="triggerUpload(this)">
+          <input type="file" accept="image/*" onchange="handleUpload(event, this.parentElement)">
+          <div class="photo-placeholder">
+            <div class="icon">📷</div>
+            <div class="title">Upload Foto</div>
+            <div class="hint">Klik untuk memilih gambar</div>
+          </div>
+          <div class="photo-actions">
+            <button class="photo-btn" onclick="event.stopPropagation();triggerUpload(this.parentElement.parentElement)">✏️</button>
+            <button class="photo-btn delete" onclick="event.stopPropagation();deletePhoto(this.parentElement.parentElement)">🗑️</button>
+          </div>
+          <div class="photo-label">Tentang Kami</div>
+        </div>
+      </div>
+      <div class="content-right">
+        <div class="slide-number">01 · Tentang Kami</div>
+        <h2 class="content-title">Apa itu <span class="green">PPDA 12</span>?</h2>
+        <p class="content-desc">PPDA 12 adalah Perkemahan Penggalang/Penegak Dzikro Ambalan Al-Chasbu As-Su’adah (PPDA) ke-XII Tahun 2026, yang diikuti oleh Pramuka Penggalang dan Penegak.</p>
+        <div class="definition-box">
+          <h4>Tema </h4>
+          <p>"BERAKAR PADA SATYA, BERTUMBUH DALAM DHARMA, BERBUAH BAGI NUSANTARA"</p>
+        </div>
+
+        <p>"Seorang Pramuka sejati adalah pribadi yang teguh memegang janji keimanan dan kebangsaan, senantiasa berproses dan bersikap sesuai tuntunan Dasa Darma, hingga akhirnya mampu melahirkan karya serta kebermanfaatan nyata bagi bangsa dan negara."</p>
+
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3 -->
+  <div class="slide slide-content" data-slide="3">
+    <div class="content-layout">
+      <div class="content-left">
+        <div class="photo-upload" data-photo="slide3" onclick="triggerUpload(this)">
+          <input type="file" accept="image/*" onchange="handleUpload(event, this.parentElement)">
+          <div class="photo-placeholder">
+            <div class="icon">🌱</div>
+            <div class="title">Upload Foto</div>
+            <div class="hint">Klik untuk memilih gambar</div>
+          </div>
+          <div class="photo-actions">
+            <button class="photo-btn" onclick="event.stopPropagation();triggerUpload(this.parentElement.parentElement)">✏️</button>
+            <button class="photo-btn delete" onclick="event.stopPropagation();deletePhoto(this.parentElement.parentElement)">🗑️</button>
+          </div>
+          <div class="photo-label">Perjalanan</div>
+        </div>
+      </div>
+      <div class="content-right">
+        <div class="slide-number">02 · Filosofi Logo</div>
+        <h2 class="content-title">Angka <span class="green">12 arabic</span></h2>
+        <p class="content-desc">
+Logo PPDA ke-12 merupakan representasi dari semangat pertumbuhan, keteguhan, dan persaudaraan yang menjadi landasan dalam setiap langkah perjalanan. Melalui perpaduan unsur ranting dan daun, logo ini menyampaikan pesan bahwa setiap pertumbuhan yang bermakna harus berawal dari fondasi yang kuat dan senantiasa diarahkan pada tujuan yang lebih baik.</p>
+        <div class="definition-box">
+          <h4>Definisi</h4>
+          <p>Identitas & Keberlanjutan Kegiatan (PPDA XII):
+
+Menjadi simbol resmi penyelenggaraan Pesta Penggalang dan Penegak Balekambang ke-12.
+</p>
+        </div>
+        <ul class="key-points">
+          <li>Bentuk angka 1 (١) dan 2 (٢) Arab menegaskan identitas pesantren.</li>
+         
+       
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4 -->
+  <div class="slide slide-content" data-slide="4">
+    <div class="content-layout">
+      <div class="content-left">
+        <div class="photo-upload" data-photo="slide4" onclick="triggerUpload(this)">
+          <input type="file" accept="image/*" onchange="handleUpload(event, this.parentElement)">
+          <div class="photo-placeholder">
+            <div class="icon">🍃</div>
+            <div class="title">Upload Foto</div>
+            <div class="hint">Klik untuk memilih gambar</div>
+          </div>
+          <div class="photo-actions">
+            <button class="photo-btn" onclick="event.stopPropagation();triggerUpload(this.parentElement.parentElement)">✏️</button>
+            <button class="photo-btn delete" onclick="event.stopPropagation();deletePhoto(this.parentElement.parentElement)">🗑️</button>
+          </div>
+          <div class="photo-label">Filosofi</div>
+        </div>
+      </div>
+      <div class="content-right">
+        <div class="slide-number">03 · Filosofi</div>
+        <h2 class="content-title">Ranting & <span class="green">Daun</span></h2>
+        <p class="content-desc">Bentuk ranting yang melengkung mencerminkan perjalanan yang penuh proses, pembelajaran, dan tantangan. Lekukannya menggambarkan bahwa setiap pengalaman memiliki peran dalam membentuk karakter dan memperkuat keteguhan. Sementara itu, bentuk daun yang menjulang dan dinamis melambangkan cita-cita, optimisme, serta tekad untuk terus bergerak maju. Kedua unsur ini berpadu menjadi simbol keseimbangan antara kekuatan dalam mempertahankan nilai-nilai dan keberanian dalam menghadapi perubahan.</p>
+        <div class="definition-box">
+          <h4>Definisi Warna</h4>
+          <p>Warna hijau pada daun melambangkan kehidupan, harapan, pembaruan, dan semangat untuk terus bertumbuh.</p>
+          <p>Warna cokelat pada ranting melambangkan kekuatan, kestabilan, kedewasaan, serta keteguhan dalam memegang prinsip. </p>
+        </div>
+        <ul class="key-points">
+          <li>Ranting = proses, pembelajaran, keteguhan</li>
+          <li>Daun = cita-cita, optimisme, gerakan maju</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5 -->
+  <div class="slide slide-content" data-slide="5">
+    <div class="content-layout">
+      <div class="content-left">
+        <div class="photo-upload" data-photo="slide5" onclick="triggerUpload(this)">
+          <input type="file" accept="image/*" onchange="handleUpload(event, this.parentElement)">
+          <div class="photo-placeholder">
+            <div class="icon">✨</div>
+            <div class="title">Upload Foto</div>
+            <div class="hint">Klik untuk memilih gambar</div>
+          </div>
+          <div class="photo-actions">
+            <button class="photo-btn" onclick="event.stopPropagation();triggerUpload(this.parentElement.parentElement)">✏️</button>
+            <button class="photo-btn delete" onclick="event.stopPropagation();deletePhoto(this.parentElement.parentElement)">🗑️</button>
+          </div>
+          <div class="photo-label">Visi</div>
+        </div>
+      </div>
+      <div class="content-right">
+        <div class="slide-number">04 · Visi</div>
+        <h2 class="content-title">Arah yang <span class="green">Kami Tuju</span></h2>
+        <p class="content-desc">"Mewujudkan Pramuka Penggalang dan Penegak yang Berakhlaqul Karimah, Berjiwa Pemimpin, Tangguh, Kreatif, serta Berwawasan Lingkungan Berlandaskan Nilai Dasa Darma dan Kepramukaan."</p>
+        <div class="definition-box">
+          <h4>Definisi</h4>
+          <p>Visi adalah gambaran masa depan: ekosistem pembelajaran kolaboratif yang memperkuat karakter dan menciptakan dampak positif.</p>
+        </div>
+       <p> web inspired by : r4syid </p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Controls -->
+<div class="controls">
+  <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">←</button>
+  <div class="dots" id="dots"></div>
+  <div class="slide-counter" id="counter">1 / 5</div>
+  <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">→</button>
+</div>
+
+<script>
+let currentSlide = 1;
+const totalSlides = 5;
+const slides = document.querySelectorAll('.slide');
+const progressBar = document.getElementById('progressBar');
+const counter = document.getElementById('counter');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const dotsContainer = document.getElementById('dots');
+
+for (let i = 1; i <= totalSlides; i++) {
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i === 1 ? ' active' : '');
+  dot.onclick = () => goToSlide(i);
+  dotsContainer.appendChild(dot);
+}
+
+function updateSlide() {
+  slides.forEach((slide, index) => {
+    const num = index + 1;
+    slide.classList.remove('active', 'prev');
+    if (num === currentSlide) slide.classList.add('active');
+    else if (num < currentSlide) slide.classList.add('prev');
+  });
+  document.querySelectorAll('.dot').forEach((dot, index) => {
+    dot.classList.toggle('active', index + 1 === currentSlide);
+  });
+  progressBar.style.width = ((currentSlide / totalSlides) * 100) + '%';
+  counter.textContent = `${currentSlide} / ${totalSlides}`;
+  prevBtn.disabled = currentSlide === 1;
+  nextBtn.disabled = currentSlide === totalSlides;
+}
+
+function changeSlide(direction) {
+  const newSlide = currentSlide + direction;
+  if (newSlide >= 1 && newSlide <= totalSlides) {
+    currentSlide = newSlide;
+    updateSlide();
+  }
+}
+
+function goToSlide(num) {
+  currentSlide = num;
+  updateSlide();
+}
+
+// Photo Upload
+function triggerUpload(uploadArea) {
+  uploadArea.querySelector('input[type="file"]').click();
+}
+
+function handleUpload(event, uploadArea) {
+  const file = event.target.files[0];
+  if (!file || !file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const imageData = e.target.result;
+    try { localStorage.setItem('photo_' + uploadArea.dataset.photo, imageData); } catch (err) {}
+    displayImage(uploadArea, imageData);
+  };
+  reader.readAsDataURL(file);
+}
+
+function displayImage(uploadArea, imageData) {
+  const existingPreview = uploadArea.querySelector('.photo-preview');
+  if (existingPreview) existingPreview.remove();
+  const placeholder = uploadArea.querySelector('.photo-placeholder');
+  if (placeholder) placeholder.style.display = 'none';
+  const img = document.createElement('img');
+  img.className = 'photo-preview';
+  img.src = imageData;
+  uploadArea.insertBefore(img, uploadArea.firstChild);
+  uploadArea.classList.add('has-image');
+}
+
+function deletePhoto(uploadArea) {
+  if (!confirm('Hapus foto ini?')) return;
+  localStorage.removeItem('photo_' + uploadArea.dataset.photo);
+  const preview = uploadArea.querySelector('.photo-preview');
+  if (preview) preview.remove();
+  const placeholder = uploadArea.querySelector('.photo-placeholder');
+  if (placeholder) placeholder.style.display = 'flex';
+  uploadArea.classList.remove('has-image');
+  const input = uploadArea.querySelector('input[type="file"]');
+  if (input) input.value = '';
+}
+
+function loadSavedPhotos() {
+  document.querySelectorAll('.photo-upload').forEach(area => {
+    const saved = localStorage.getItem('photo_' + area.dataset.photo);
+    if (saved) displayImage(area, saved);
+  });
+}
+
+// Keyboard
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); changeSlide(1); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); changeSlide(-1); }
+  else if (e.key === 'Home') { e.preventDefault(); goToSlide(1); }
+  else if (e.key === 'End') { e.preventDefault(); goToSlide(totalSlides); }
+});
+
+// Touch
+let touchStartX = 0;
+document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+document.addEventListener('touchend', (e) => {
+  const diff = touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) changeSlide(diff > 0 ? 1 : -1);
+});
+
+loadSavedPhotos();
+updateSlide();
+</script>
+</body>
+</html>
